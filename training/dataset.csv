@@ -1,0 +1,21 @@
+text,category
+"Payment failed during checkout and customer was charged twice",Billing
+"Unable to reset my password and login to account",Account Access
+"The dashboard crashes whenever I upload a PDF",Bug Report
+"Can you add dark mode to the application?",Feature Request
+"How do I export reports to Excel?",How-To Question
+"I need help understanding pricing plans",General Inquiry
+"Refund has not been processed yet",Billing
+"App becomes very slow after latest update",Bug Report
+"Need urgent access to admin dashboard",Account Access
+"How can I change my subscription?",How-To Question
+"We would love Slack integration support",Feature Request
+"The login page shows internal server error",Bug Report
+"Customer invoice amount is incorrect",Billing
+"I cannot access my workspace",Account Access
+"Please add multi-language support",Feature Request
+"Where can I download invoices?",How-To Question
+"The production system is down",Bug Report
+"My credit card was declined incorrectly",Billing
+"Can you explain notifications feature?",General Inquiry
+"We need enterprise API access",Feature Request

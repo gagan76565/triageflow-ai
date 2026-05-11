@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2 class="text-4xl font-bold mb-10">
+    AI Analysis Result
+</h2>
+
+<div class="bg-slate-800 p-8 rounded-2xl space-y-6">
+
+    <div>
+
+        <h3 class="text-slate-400 mb-2">
+            Support Email
+        </h3>
+
+        <p class="bg-slate-900 p-4 rounded-xl">
+            {{ result.email }}
+        </p>
+
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="bg-slate-900 p-6 rounded-xl">
+
+            <h3 class="text-slate-400">
+                Category
+            </h3>
+
+            <p class="text-2xl font-bold mt-2 text-cyan-400">
+                {{ result.category }}
+            </p>
+
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-xl">
+
+            <h3 class="text-slate-400">
+                Confidence
+            </h3>
+
+            <p class="text-2xl font-bold mt-2 text-green-400">
+                {{ result.confidence }}%
+            </p>
+
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-xl">
+
+            <h3 class="text-slate-400">
+                Urgency
+            </h3>
+
+            <p class="text-2xl font-bold mt-2 text-red-400">
+                {{ result.urgency }}
+            </p>
+
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-xl">
+
+            <h3 class="text-slate-400">
+                Assigned Team
+            </h3>
+
+            <p class="text-2xl font-bold mt-2 text-yellow-400">
+                {{ result.assigned_team }}
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

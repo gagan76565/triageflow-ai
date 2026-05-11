@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2 class="text-4xl font-bold mb-8">
+    Support Dashboard
+</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="bg-slate-800 p-6 rounded-2xl">
+        <h3 class="text-slate-400">Total Tickets</h3>
+        <p class="text-4xl font-bold mt-2">128</p>
+    </div>
+
+    <div class="bg-slate-800 p-6 rounded-2xl">
+        <h3 class="text-slate-400">Critical Issues</h3>
+        <p class="text-4xl font-bold mt-2 text-red-400">12</p>
+    </div>
+
+    <div class="bg-slate-800 p-6 rounded-2xl">
+        <h3 class="text-slate-400">Resolved Today</h3>
+        <p class="text-4xl font-bold mt-2 text-green-400">37</p>
+    </div>
+
+</div>
+
+{% endblock %}

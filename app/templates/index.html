@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="py-16">
+
+    <div class="text-center mb-12">
+
+        <h1 class="text-6xl font-extrabold mb-6">
+            TriageFlow AI
+        </h1>
+
+        <p class="text-slate-300 text-xl max-w-3xl mx-auto">
+            AI-powered support email classification,
+            urgency detection,
+            and intelligent ticket routing.
+        </p>
+
+    </div>
+
+    <div class="max-w-4xl mx-auto bg-slate-800 p-8 rounded-2xl">
+
+        <form action="/analyze" method="POST">
+
+            <label class="block mb-4 text-lg font-semibold">
+                Paste Support Email
+            </label>
+
+            <textarea
+                name="email"
+                rows="10"
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-white"
+                placeholder="Enter support email here..."
+                required
+            ></textarea>
+
+            <button
+                type="submit"
+                class="mt-6 w-full bg-cyan-500 hover:bg-cyan-600 py-4 rounded-xl text-lg font-bold"
+            >
+                Analyze Ticket
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
