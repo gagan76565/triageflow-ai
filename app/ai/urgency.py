@@ -1,33 +1,46 @@
-HIGH_PRIORITY_KEYWORDS = [
-    "urgent",
+CRITICAL_KEYWORDS = [
+    "critical",
+    "production down",
+    "server down",
+    "cannot login",
+    "system down",
+    "urgent"
+]
+
+HIGH_KEYWORDS = [
+    "failed",
+    "error",
     "asap",
     "immediately",
-    "critical",
-    "down",
-    "cannot",
-    "can't",
-    "failed",
-    "error"
+    "not working"
+]
+
+MEDIUM_KEYWORDS = [
+    "slow",
+    "issue",
+    "problem"
 ]
 
 def detect_urgency(text):
 
     text = text.lower()
 
-    score = 0
-
-    for keyword in HIGH_PRIORITY_KEYWORDS:
+    # Critical
+    for keyword in CRITICAL_KEYWORDS:
 
         if keyword in text:
-            score += 1
+            return "Critical"
 
-    if score >= 4:
-        return "Critical"
+    # High
+    for keyword in HIGH_KEYWORDS:
 
-    elif score >= 2:
-        return "High"
+        if keyword in text:
+            return "High"
 
-    elif score >= 1:
-        return "Medium"
+    # Medium
+    for keyword in MEDIUM_KEYWORDS:
+
+        if keyword in text:
+            return "Medium"
 
     return "Low"

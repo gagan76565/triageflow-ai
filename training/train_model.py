@@ -8,29 +8,39 @@ from sklearn.pipeline import Pipeline
 # Load dataset
 df = pd.read_csv("dataset.csv")
 
-# Features and labels
 X = df["text"]
 y = df["category"]
 
-# Create NLP pipeline
+# Improved pipeline
 pipeline = Pipeline([
+
     (
         "tfidf",
-        TfidfVectorizer(stop_words="english")
+
+        TfidfVectorizer(
+            stop_words="english",
+            ngram_range=(1, 2),
+            max_features=5000
+        )
     ),
+
     (
         "classifier",
-        LogisticRegression(max_iter=1000)
+
+        LogisticRegression(
+            max_iter=2000,
+            C=2.0
+        )
     )
 ])
 
 # Train model
 pipeline.fit(X, y)
 
-# Save trained model
+# Save model
 joblib.dump(
     pipeline,
     "saved_models/ticket_classifier.pkl"
 )
 
-print("Model trained successfully!")
+print("Improved model trained successfully!")

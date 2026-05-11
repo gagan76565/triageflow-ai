@@ -1,21 +1,61 @@
 text,category
-"Payment failed during checkout and customer was charged twice",Billing
-"Unable to reset my password and login to account",Account Access
-"The dashboard crashes whenever I upload a PDF",Bug Report
-"Can you add dark mode to the application?",Feature Request
-"How do I export reports to Excel?",How-To Question
-"I need help understanding pricing plans",General Inquiry
-"Refund has not been processed yet",Billing
-"App becomes very slow after latest update",Bug Report
-"Need urgent access to admin dashboard",Account Access
-"How can I change my subscription?",How-To Question
-"We would love Slack integration support",Feature Request
-"The login page shows internal server error",Bug Report
-"Customer invoice amount is incorrect",Billing
-"I cannot access my workspace",Account Access
-"Please add multi-language support",Feature Request
+"Payment failed during checkout",Billing
+"Customer charged twice for same order",Billing
+"Refund still not processed",Billing
+"Invoice amount incorrect",Billing
+"Unable to update payment method",Billing
+"Subscription renewal failed",Billing
+"Credit card declined unexpectedly",Billing
+"Billing portal not loading",Billing
+"Need refund for cancelled subscription",Billing
+"Payment gateway timeout issue",Billing
+"App crashes when uploading files",Bug Report
+"Dashboard not loading properly",Bug Report
+"Internal server error on login",Bug Report
+"Production server is down",Bug Report
+"Website becomes slow after update",Bug Report
+"Users cannot access application",Bug Report
+"File upload causing application crash",Bug Report
+"Error 500 on checkout page",Bug Report
+"Notification system not working",Bug Report
+"Search feature broken after deployment",Bug Report
+"Please add dark mode",Feature Request
+"Need Slack integration support",Feature Request
+"Add multi-language support",Feature Request
+"Can you integrate Microsoft Teams?",Feature Request
+"Please add mobile app support",Feature Request
+"Would like export to CSV feature",Feature Request
+"Need advanced analytics dashboard",Feature Request
+"Please support API integrations",Feature Request
+"Can you add role-based access?",Feature Request
+"Need customizable notifications",Feature Request
+"Unable to login to account",Account Access
+"Password reset email not received",Account Access
+"Cannot access admin dashboard",Account Access
+"My account is locked",Account Access
+"Two-factor authentication failing",Account Access
+"Login session expired immediately",Account Access
+"Unable to verify account email",Account Access
+"Access denied for valid credentials",Account Access
+"Cannot access workspace",Account Access
+"Team members unable to login",Account Access
+"How do I export reports?",How-To Question
+"How can I change subscription plan?",How-To Question
 "Where can I download invoices?",How-To Question
-"The production system is down",Bug Report
-"My credit card was declined incorrectly",Billing
-"Can you explain notifications feature?",General Inquiry
-"We need enterprise API access",Feature Request
+"How to invite team members?",How-To Question
+"How do I enable notifications?",How-To Question
+"How can I reset password?",How-To Question
+"How to connect Slack integration?",How-To Question
+"Where can I view analytics?",How-To Question
+"How do I update billing details?",How-To Question
+"How to configure API access?",How-To Question
+"I need help understanding pricing",General Inquiry
+"Can someone explain enterprise plans?",General Inquiry
+"What features are included?",General Inquiry
+"Need more information about platform",General Inquiry
+"Interested in business subscription",General Inquiry
+"Can I schedule a product demo?",General Inquiry
+"What support options are available?",General Inquiry
+"Need clarification on onboarding",General Inquiry
+"Looking for platform documentation",General Inquiry
+"Want to learn more about integrations",General Inquiry

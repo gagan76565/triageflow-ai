@@ -72,6 +72,72 @@
 
     </div>
 
+    <!-- Similar Tickets -->
+
+    {% if result.similar_tickets %}
+
+    <div class="mt-10">
+
+        <h3 class="text-2xl font-bold mb-4">
+            Similar Previous Tickets
+        </h3>
+
+        <div class="space-y-4">
+
+            {% for item in result.similar_tickets %}
+
+            <div class="bg-slate-900 p-4 rounded-xl">
+
+                <p class="mb-2">
+                    {{ item.ticket }}
+                </p>
+
+                <p class="text-cyan-400 font-bold">
+                    Similarity: {{ item.similarity }}%
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+{% if result.ai_warning %}
+
+<div class="bg-yellow-500/20 border border-yellow-500 p-4 rounded-xl mt-8">
+
+    <h3 class="text-yellow-300 font-bold mb-2">
+        AI Warning
+    </h3>
+
+    <p class="text-yellow-100">
+        {{ result.ai_warning }}
+    </p>
+
+</div>
+
+{% endif %}
+<div class="mt-10 flex gap-4">
+
+    <a
+        href="/"
+        class="bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl font-bold"
+    >
+        Analyze Another Ticket
+    </a>
+
+    <a
+        href="/dashboard"
+        class="bg-slate-700 hover:bg-slate-600 px-6 py-3 rounded-xl font-bold"
+    >
+        Open Dashboard
+    </a>
+
 </div>
 
 {% endblock %}

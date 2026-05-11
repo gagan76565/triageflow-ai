@@ -15,6 +15,8 @@ def create_app():
 
     db.init_app(app)
 
+    from app.models.ticket import Ticket
+
     from app.routes.main import main
 
     app.register_blueprint(main)
