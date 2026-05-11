@@ -178,87 +178,85 @@
             </thead>
 
             <tbody>
-                <tbody>
 
-    {% if tickets %}
+                {% if tickets %}
 
-        {% for ticket in tickets %}
+                    {% for ticket in tickets %}
 
-        <tr class="border-b border-slate-700">
+                    <tr class="border-b border-slate-700">
 
-            <td class="p-4">
-                {{ ticket.category }}
-            </td>
+                        <td class="p-4">
+                            {{ ticket.category }}
+                        </td>
 
-            <td class="p-4">
+                        <td class="p-4">
 
-                {% if ticket.urgency == "Critical" %}
+                            {% if ticket.urgency == "Critical" %}
 
-                    <span class="text-red-400 font-bold">
-                        {{ ticket.urgency }}
-                    </span>
+                                <span class="text-red-400 font-bold">
+                                    {{ ticket.urgency }}
+                                </span>
 
-                {% elif ticket.urgency == "High" %}
+                            {% elif ticket.urgency == "High" %}
 
-                    <span class="text-orange-400 font-bold">
-                        {{ ticket.urgency }}
-                    </span>
+                                <span class="text-orange-400 font-bold">
+                                    {{ ticket.urgency }}
+                                </span>
 
-                {% elif ticket.urgency == "Medium" %}
+                            {% elif ticket.urgency == "Medium" %}
 
-                    <span class="text-yellow-400 font-bold">
-                        {{ ticket.urgency }}
-                    </span>
+                                <span class="text-yellow-400 font-bold">
+                                    {{ ticket.urgency }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-green-400 font-bold">
+                                    {{ ticket.urgency }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="p-4">
+                            {{ ticket.assigned_team }}
+                        </td>
+
+                        <td class="p-4">
+                            {{ ticket.confidence }}%
+                        </td>
+
+                        <td class="p-4">
+
+                            <a
+                                href="/update-status/{{ ticket.id }}"
+                                class="bg-cyan-500 hover:bg-cyan-600 px-3 py-1 rounded-full text-sm"
+                            >
+                                {{ ticket.status }}
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
 
                 {% else %}
 
-                    <span class="text-green-400 font-bold">
-                        {{ ticket.urgency }}
-                    </span>
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="text-center p-10 text-slate-400"
+                        >
+                            No tickets found.
+                        </td>
+
+                    </tr>
 
                 {% endif %}
 
-            </td>
-
-            <td class="p-4">
-                {{ ticket.assigned_team }}
-            </td>
-
-            <td class="p-4">
-                {{ ticket.confidence }}%
-            </td>
-
-            <td class="p-4">
-
-                <a
-                    href="/update-status/{{ ticket.id }}"
-                    class="bg-cyan-500 hover:bg-cyan-600 px-3 py-1 rounded-full text-sm"
-                >
-                    {{ ticket.status }}
-                </a>
-
-            </td>
-
-        </tr>
-
-        {% endfor %}
-
-    {% else %}
-
-        <tr>
-
-            <td
-                colspan="5"
-                class="text-center p-10 text-slate-400"
-            >
-                No tickets found.
-            </td>
-
-        </tr>
-
-    {% endif %}
-
-</tbody>
             </tbody>
 
         </table>
