@@ -1,352 +1,187 @@
 {% extends "layout.html" %}
 
 {% block content %}
-
-<h2 class="text-4xl font-bold mb-8">
-    Support Dashboard
-</h2>
-
-<!-- Stats Cards -->
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-
-    <div class="bg-slate-800 p-6 rounded-2xl">
-
-        <h3 class="text-slate-400">
-            Total Tickets
-        </h3>
-
-        <p class="text-4xl font-bold mt-2">
-            {{ total_tickets }}
-        </p>
-
-    </div>
-
-    <div class="bg-slate-800 p-6 rounded-2xl">
-
-        <h3 class="text-slate-400">
-            Critical Issues
-        </h3>
-
-        <p class="text-4xl font-bold mt-2 text-red-400">
-            {{ critical_tickets }}
-        </p>
-
-    </div>
-
-    <div class="bg-slate-800 p-6 rounded-2xl">
-
-        <h3 class="text-slate-400">
-            Resolved Tickets
-        </h3>
-
-        <p class="text-4xl font-bold mt-2 text-green-400">
-            {{ resolved_tickets }}
-        </p>
-
-    </div>
-
-</div>
-
-<!-- Charts -->
-
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-
-    <!-- Category Chart -->
-
-    <div class="bg-slate-800 p-6 rounded-2xl">
-
-        <h3 class="text-2xl font-bold mb-6">
-            Ticket Categories
-        </h3>
-
-        <canvas id="categoryChart"></canvas>
-
-    </div>
-
-    <!-- Urgency Chart -->
-
-    <div class="bg-slate-800 p-6 rounded-2xl">
-
-        <h3 class="text-2xl font-bold mb-6">
-            Urgency Distribution
-        </h3>
-
-        <canvas id="urgencyChart"></canvas>
-
-    </div>
-
-</div>
-
-<!-- Search & Filters -->
-
-<div class="bg-slate-800 p-6 rounded-2xl mb-8">
-
-    <form method="GET" action="/dashboard">
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-            <input
-                type="text"
-                name="search"
-                placeholder="Search tickets..."
-                class="bg-slate-900 border border-slate-700 rounded-xl p-3 text-white"
-            >
-
-            <select
-                name="urgency"
-                class="bg-slate-900 border border-slate-700 rounded-xl p-3 text-white"
-            >
-
-                <option value="">
-                    All Urgency Levels
-                </option>
-
-                <option value="Critical">
-                    Critical
-                </option>
-
-                <option value="High">
-                    High
-                </option>
-
-                <option value="Medium">
-                    Medium
-                </option>
-
-                <option value="Low">
-                    Low
-                </option>
-
-            </select>
-
-            <button
-                type="submit"
-                class="bg-cyan-500 hover:bg-cyan-600 rounded-xl font-bold"
-            >
-                Apply Filters
-            </button>
-
+<div class="py-4">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-4xl font-bold">Support Dashboard</h1>
+            <p class="text-slate-400 mt-2">Monitor, review, and manage support tickets.</p>
         </div>
+        <a href="{{ url_for('main.home') }}#new-ticket"
+           class="bg-cyan-500 hover:bg-cyan-600 px-5 py-3 rounded-xl font-bold">
+            + New Ticket
+        </a>
+    </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="mb-5 p-4 rounded-xl
+                {% if category == 'success' %}bg-green-500/10 border border-green-500 text-green-300
+                {% else %}bg-cyan-500/10 border border-cyan-500 text-cyan-300{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-slate-800 p-6 rounded-2xl">
+            <p class="text-slate-400">Total Tickets</p>
+            <p class="text-4xl font-bold mt-3">{{ total_tickets }}</p>
+        </div>
+        <div class="bg-slate-800 p-6 rounded-2xl">
+            <p class="text-slate-400">Critical Issues</p>
+            <p class="text-4xl font-bold mt-3 text-red-400">{{ critical_tickets }}</p>
+        </div>
+        <div class="bg-slate-800 p-6 rounded-2xl">
+            <p class="text-slate-400">Resolved Tickets</p>
+            <p class="text-4xl font-bold mt-3 text-green-400">{{ resolved_tickets }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <section class="bg-slate-800 p-6 rounded-2xl">
+            <h2 class="text-2xl font-bold mb-6">Ticket Categories</h2>
+            <div class="relative h-80"><canvas id="categoryChart"></canvas></div>
+        </section>
+        <section class="bg-slate-800 p-6 rounded-2xl">
+            <h2 class="text-2xl font-bold mb-6">Urgency Distribution</h2>
+            <div class="relative h-80"><canvas id="urgencyChart"></canvas></div>
+        </section>
+    </div>
+
+    <form method="GET" action="{{ url_for('main.dashboard') }}"
+          class="bg-slate-800 p-6 rounded-2xl mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input type="search" name="search" value="{{ search }}"
+                   placeholder="Search ticket emails..."
+                   class="min-w-0 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
+            <select name="urgency" class="min-w-0 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
+                <option value="">All Urgency Levels</option>
+                {% for level in urgency_levels %}
+                    <option value="{{ level }}" {% if urgency_filter == level %}selected{% endif %}>{{ level }}</option>
+                {% endfor %}
+            </select>
+            <select name="status" class="min-w-0 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
+                <option value="">All Statuses</option>
+                <option value="Open" {% if status_filter == "Open" %}selected{% endif %}>Open</option>
+                <option value="Resolved" {% if status_filter == "Resolved" %}selected{% endif %}>Resolved</option>
+            </select>
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-600 rounded-xl font-bold px-4 py-3">Apply</button>
+                <a href="{{ url_for('main.dashboard') }}" class="bg-slate-700 hover:bg-slate-600 rounded-xl px-4 py-3">Reset</a>
+            </div>
+        </div>
     </form>
 
-</div>
-
-<!-- Ticket Table -->
-
-<div class="bg-slate-800 rounded-2xl overflow-hidden">
-
-    <div class="p-6 border-b border-slate-700">
-
-        <h3 class="text-2xl font-bold">
-            Recent Tickets
-        </h3>
-
-    </div>
-
-    <div class="overflow-x-auto">
-
-        <table class="w-full">
-
-            <thead class="bg-slate-900">
-
-                <tr>
-
-                    <th class="text-left p-4">
-                        Category
-                    </th>
-
-                    <th class="text-left p-4">
-                        Urgency
-                    </th>
-
-                    <th class="text-left p-4">
-                        Team
-                    </th>
-
-                    <th class="text-left p-4">
-                        Confidence
-                    </th>
-
-                    <th class="text-left p-4">
-                        Status
-                    </th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                {% if tickets %}
-
-                    {% for ticket in tickets %}
-
-                    <tr class="border-b border-slate-700">
-
-                        <td class="p-4">
-                            {{ ticket.category }}
-                        </td>
-
-                        <td class="p-4">
-
-                            {% if ticket.urgency == "Critical" %}
-
-                                <span class="text-red-400 font-bold">
-                                    {{ ticket.urgency }}
-                                </span>
-
-                            {% elif ticket.urgency == "High" %}
-
-                                <span class="text-orange-400 font-bold">
-                                    {{ ticket.urgency }}
-                                </span>
-
-                            {% elif ticket.urgency == "Medium" %}
-
-                                <span class="text-yellow-400 font-bold">
-                                    {{ ticket.urgency }}
-                                </span>
-
-                            {% else %}
-
-                                <span class="text-green-400 font-bold">
-                                    {{ ticket.urgency }}
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td class="p-4">
-                            {{ ticket.assigned_team }}
-                        </td>
-
-                        <td class="p-4">
-                            {{ ticket.confidence }}%
-                        </td>
-
-                        <td class="p-4">
-
-                            <a
-                                href="/update-status/{{ ticket.id }}"
-                                class="bg-cyan-500 hover:bg-cyan-600 px-3 py-1 rounded-full text-sm"
-                            >
-                                {{ ticket.status }}
-                            </a>
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                {% else %}
-
+    <section class="bg-slate-800 rounded-2xl overflow-hidden">
+        <div class="p-6 border-b border-slate-700">
+            <h2 class="text-2xl font-bold">Recent Tickets</h2>
+            <p class="text-slate-400 mt-1">{{ tickets|length }} ticket(s) match your filters.</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900 text-slate-300">
                     <tr>
-
-                        <td
-                            colspan="5"
-                            class="text-center p-10 text-slate-400"
-                        >
-                            No tickets found.
-                        </td>
-
+                        <th class="p-4">Ticket</th><th class="p-4">Category</th>
+                        <th class="p-4">Urgency</th><th class="p-4">Team</th>
+                        <th class="p-4">Confidence</th><th class="p-4">Status</th>
+                        <th class="p-4">Actions</th>
                     </tr>
-
-                {% endif %}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr class="border-t border-slate-700 hover:bg-slate-700/30">
+                        <td class="p-4 whitespace-nowrap">#{{ ticket.id }}</td>
+                        <td class="p-4">{{ ticket.category }}</td>
+                        <td class="p-4">
+                            <span class="font-semibold
+                                {% if ticket.urgency == 'Critical' %}text-red-400
+                                {% elif ticket.urgency == 'High' %}text-orange-400
+                                {% elif ticket.urgency == 'Medium' %}text-yellow-400
+                                {% else %}text-green-400{% endif %}">
+                                {{ ticket.urgency }}
+                            </span>
+                        </td>
+                        <td class="p-4">{{ ticket.assigned_team }}</td>
+                        <td class="p-4 whitespace-nowrap">{{ "%.2f"|format(ticket.confidence) }}%</td>
+                        <td class="p-4">
+                            {% if ticket.status == "Resolved" %}
+                                <span class="bg-green-500/10 text-green-300 px-3 py-1 rounded-full text-sm">Resolved</span>
+                            {% else %}
+                                <span class="bg-cyan-500/10 text-cyan-300 px-3 py-1 rounded-full text-sm">Open</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <a href="{{ url_for('main.ticket_detail', ticket_id=ticket.id) }}"
+                                   class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-sm font-semibold">Open</a>
+                                {% if ticket.status != "Resolved" %}
+                                <form method="POST"
+                                      action="{{ url_for('main.resolve_ticket', ticket_id=ticket.id) }}"
+                                      onsubmit="return confirm('Mark ticket #{{ ticket.id }} as resolved?');">
+                                    <button type="submit"
+                                            class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+                                        Mark Resolved
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="p-10 text-center text-slate-400">
+                        No tickets match your filters.
+                        <a href="{{ url_for('main.home') }}#new-ticket" class="text-cyan-400 underline">Create a new ticket</a>.
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
-
-<!-- Chart Scripts -->
 
 <script>
+const chartTextColor = "#cbd5e1";
+const chartGridColor = "rgba(148, 163, 184, 0.12)";
 
-    // Category Chart
+new Chart(document.getElementById("categoryChart"), {
+    type: "doughnut",
+    data: {
+        labels: {{ categories | tojson }},
+        datasets: [{
+            data: {{ category_counts | tojson }},
+            backgroundColor: ["#06b6d4", "#ef4444", "#22c55e", "#f59e0b", "#8b5cf6", "#ec4899"],
+            borderColor: "#1e293b",
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "bottom", labels: { color: chartTextColor, padding: 16 } } }
+    }
+});
 
-    const categoryCtx = document
-        .getElementById('categoryChart');
-
-    new Chart(categoryCtx, {
-
-        type: 'pie',
-
-        data: {
-
-            labels: {{ categories | tojson }},
-
-            datasets: [{
-
-                data: {{ category_counts | tojson }},
-
-                backgroundColor: [
-                    '#06b6d4',
-                    '#ef4444',
-                    '#22c55e',
-                    '#f59e0b',
-                    '#8b5cf6',
-                    '#ec4899'
-                ]
-
-            }]
-
-        }
-
-    });
-
-    // Urgency Chart
-
-    const urgencyCtx = document
-        .getElementById('urgencyChart');
-
-    new Chart(urgencyCtx, {
-
-        type: 'bar',
-
-        data: {
-
-            labels: {{ urgency_levels | tojson }},
-
-            datasets: [{
-
-                label: 'Tickets',
-
-                data: {{ urgency_counts | tojson }},
-
-                backgroundColor: [
-                    '#ef4444',
-                    '#f97316',
-                    '#eab308',
-                    '#22c55e'
-                ]
-
-            }]
-
+new Chart(document.getElementById("urgencyChart"), {
+    type: "bar",
+    data: {
+        labels: {{ urgency_levels | tojson }},
+        datasets: [{
+            label: "Tickets",
+            data: {{ urgency_counts | tojson }},
+            backgroundColor: ["#ef4444", "#f97316", "#eab308", "#22c55e"],
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: { ticks: { color: chartTextColor }, grid: { color: chartGridColor } },
+            y: { beginAtZero: true, ticks: { color: chartTextColor, precision: 0, stepSize: 1 }, grid: { color: chartGridColor } }
         },
-
-        options: {
-
-            scales: {
-
-                y: {
-
-                    beginAtZero: true
-
-                }
-
-            }
-
-        }
-
-    });
-
+        plugins: { legend: { labels: { color: chartTextColor } } }
+    }
+});
 </script>
-
 {% endblock %}
