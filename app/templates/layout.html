@@ -4,39 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TriageFlow AI</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        body {
-            background-color: #0f172a;
-            color: white;
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0f172a; color: white; }
+    </style>
 </head>
 <body>
-
-<nav class="bg-slate-900 border-b border-slate-700 p-4">
-
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-
-        <h1 class="text-2xl font-bold text-cyan-400">
+<nav class="bg-slate-900 border-b border-slate-700 px-4 py-4">
+    <div class="max-w-7xl mx-auto flex flex-wrap gap-4 justify-between items-center">
+        <a href="{{ url_for('main.home') }}" class="text-2xl font-bold text-cyan-400">
             TriageFlow AI
-        </h1>
-
-        <a href="/dashboard"
-           class="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-lg">
-            Dashboard
         </a>
-
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('main.home') }}#new-ticket"
+               class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-semibold">
+                + New Ticket
+            </a>
+            <a href="{{ url_for('main.dashboard') }}"
+               class="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-lg font-semibold">
+                Dashboard
+            </a>
+        </div>
     </div>
-
 </nav>
-
 <main class="max-w-7xl mx-auto p-6">
     {% block content %}{% endblock %}
 </main>
-
 </body>
 </html>
