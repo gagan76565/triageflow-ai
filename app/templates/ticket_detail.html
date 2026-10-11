@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-4">
+    <a href="{{ url_for('main.dashboard') }}" class="inline-flex text-cyan-400 hover:text-cyan-300 mb-8">
+        &larr; Back to Dashboard
+    </a>
+
+    <div class="flex flex-wrap justify-between items-start gap-4 mb-8">
+        <div>
+            <p class="text-cyan-400 font-semibold mb-2">Ticket #{{ ticket.id }}</p>
+            <h1 class="text-4xl font-bold">Ticket Details</h1>
+            <p class="text-slate-400 mt-2">Review the original email and AI triage results.</p>
+        </div>
+        {% if ticket.status == "Resolved" %}
+            <span class="bg-green-500/10 border border-green-500/30 text-green-300 px-4 py-2 rounded-full">Resolved</span>
+        {% else %}
+            <span class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 px-4 py-2 rounded-full">Open</span>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="mb-5 p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-300">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <section class="bg-slate-800 p-6 md:p-8 rounded-2xl mb-8">
+        <h2 class="text-xl font-bold mb-4">Original Support Email</h2>
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-5">
+            <p class="text-slate-200 whitespace-pre-wrap break-words">{{ ticket.email }}</p>
+        </div>
+        <p class="text-slate-400 text-sm mt-4">
+            Submitted:
+            {% if ticket.created_at %}{{ ticket.created_at.strftime("%d %b %Y, %I:%M %p") }}{% else %}Not available{% endif %}
+        </p>
+    </section>
+
+    <section class="bg-slate-800 p-6 md:p-8 rounded-2xl mb-8">
+        <h2 class="text-xl font-bold mb-6">AI Triage Results</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="bg-slate-900 p-5 rounded-xl">
+                <p class="text-slate-400 mb-2">Category</p>
+                <p class="text-xl font-bold text-cyan-400">{{ ticket.category }}</p>
+            </div>
+            <div class="bg-slate-900 p-5 rounded-xl">
+                <p class="text-slate-400 mb-2">Model Confidence</p>
+                <p class="text-xl font-bold text-green-400">{{ "%.2f"|format(ticket.confidence) }}%</p>
+                {% if ticket.confidence < 50 %}<p class="text-yellow-300 text-sm mt-2">Manual review recommended.</p>{% endif %}
+            </div>
+            <div class="bg-slate-900 p-5 rounded-xl">
+                <p class="text-slate-400 mb-2">Urgency</p>
+                <p class="text-xl font-bold {% if ticket.urgency == 'Critical' %}text-red-400{% elif ticket.urgency == 'High' %}text-orange-400{% elif ticket.urgency == 'Medium' %}text-yellow-400{% else %}text-green-400{% endif %}">{{ ticket.urgency }}</p>
+            </div>
+            <div class="bg-slate-900 p-5 rounded-xl">
+                <p class="text-slate-400 mb-2">Assigned Team</p>
+                <p class="text-xl font-bold text-yellow-400">{{ ticket.assigned_team }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-slate-800 p-6 md:p-8 rounded-2xl">
+        <h2 class="text-xl font-bold mb-2">Ticket Management</h2>
+        <p class="text-slate-400 mb-6">
+            {% if ticket.status == "Open" %}This ticket is awaiting resolution.{% else %}This ticket has been marked as resolved.{% endif %}
+        </p>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ url_for('main.dashboard') }}" class="bg-slate-700 hover:bg-slate-600 px-5 py-3 rounded-xl font-semibold">Back to Tickets</a>
+            {% if ticket.status != "Resolved" %}
+            <form method="POST" action="{{ url_for('main.resolve_ticket', ticket_id=ticket.id) }}"
+                  onsubmit="return confirm('Mark this ticket as resolved?');">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 px-5 py-3 rounded-xl font-semibold">Mark Resolved</button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('main.home') }}#new-ticket" class="bg-cyan-500 hover:bg-cyan-600 px-5 py-3 rounded-xl font-semibold">+ New Ticket</a>
+        </div>
+    </section>
+</div>
+{% endblock %}
