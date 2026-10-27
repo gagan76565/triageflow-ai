@@ -1,14 +1,16 @@
 import csv
+import hmac
 import io
 
-from flask import Blueprint, flash, make_response, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, jsonify, make_response, redirect, render_template, request, url_for
+from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.ai.assigner import assign_team
 from app.ai.classifier import predict_category
 from app.ai.similarity import find_similar_tickets
 from app.ai.urgency import detect_urgency
-from app.models.ticket import Ticket
+from app.models.ticket import IngestionEvent, Ticket
 
 main = Blueprint("main", __name__)
 
@@ -245,6 +247,72 @@ def download_bulk_report():
     response.headers["Content-Type"] = "text/csv; charset=utf-8"
     response.headers["Content-Disposition"] = 'attachment; filename="triageflow-batch-report.csv"'
     return response
+
+
+
+@main.route("/api/integrations/google-sheets/tickets", methods=["POST"])
+def ingest_google_sheets_ticket():
+    """Receive one new Google Sheets row. source_id makes retries idempotent."""
+    configured_token = current_app.config.get("TRIAGEFLOW_WEBHOOK_TOKEN", "")
+    if not configured_token:
+        return jsonify({"error": "Google Sheets ingestion is not configured."}), 503
+
+    supplied_token = request.headers.get("X-Webhook-Token", "")
+    if not hmac.compare_digest(supplied_token, configured_token):
+        return jsonify({"error": "Unauthorized."}), 401
+
+    payload = request.get_json(silent=True) or {}
+    source_id = str(payload.get("source_id", "")).strip()
+    email_text = str(payload.get("email", "")).strip()
+    source_name = str(payload.get("source_name", "google_sheets")).strip()[:120]
+
+    if not source_id or not email_text:
+        return jsonify({"error": "source_id and email are required."}), 400
+    if len(source_id) > 255:
+        return jsonify({"error": "source_id must be 255 characters or fewer."}), 400
+    if len(email_text) > 20000:
+        return jsonify({"error": "Ticket text exceeds the 20,000-character limit."}), 413
+
+    existing_event = IngestionEvent.query.filter_by(source_id=source_id).first()
+    if existing_event:
+        return jsonify({
+            "status": "duplicate",
+            "message": "This source row has already been processed.",
+            "ticket_id": existing_event.ticket_id,
+        }), 200
+
+    try:
+        ticket, _ = analyze_and_save_ticket(email_text, include_similarity=False)
+        db.session.flush()
+        event = IngestionEvent(
+            source_id=source_id,
+            source_name=source_name or "google_sheets",
+            ticket_id=ticket.id,
+        )
+        db.session.add(event)
+        db.session.commit()
+        return jsonify({
+            "status": "processed",
+            "ticket_id": ticket.id,
+            "category": ticket.category,
+            "confidence": ticket.confidence,
+            "urgency": ticket.urgency,
+            "assigned_team": ticket.assigned_team,
+        }), 201
+    except IntegrityError:
+        db.session.rollback()
+        existing_event = IngestionEvent.query.filter_by(source_id=source_id).first()
+        if existing_event:
+            return jsonify({
+                "status": "duplicate",
+                "ticket_id": existing_event.ticket_id,
+            }), 200
+        current_app.logger.exception("Google Sheets ingestion database conflict.")
+        return jsonify({"error": "Could not save the incoming ticket."}), 500
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Google Sheets ticket analysis failed.")
+        return jsonify({"error": "Ticket analysis failed. The sender may retry safely."}), 500
 
 
 @main.route("/dashboard")
