@@ -20,7 +20,7 @@ EMAIL_COLUMN_NAMES = {
 }
 
 
-def analyze_and_save_ticket(email_text):
+def analyze_and_save_ticket(email_text, include_similarity=True):
     """Run the existing triage pipeline and persist one ticket."""
     prediction = predict_category(email_text)
     category = prediction["category"]
@@ -28,8 +28,10 @@ def analyze_and_save_ticket(email_text):
     urgency = detect_urgency(email_text)
     assigned_team = assign_team(category)
 
-    existing_ticket_texts = [ticket.email for ticket in Ticket.query.all()]
-    similar_tickets = find_similar_tickets(email_text, existing_ticket_texts)
+    similar_tickets = []
+    if include_similarity:
+        existing_ticket_texts = [ticket.email for ticket in Ticket.query.all()]
+        similar_tickets = find_similar_tickets(email_text, existing_ticket_texts)
 
     ticket = Ticket(
         email=email_text,
@@ -139,7 +141,7 @@ def bulk_analyze():
         seen_in_upload.add(exact_key)
 
         if skip_duplicates:
-            existing = Ticket.query.filter(Ticket.email.ilike(email_text)).first()
+            existing = Ticket.query.filter_by(email=email_text).first()
             if existing:
                 report_rows.append({
                     "row_number": row_number,
@@ -155,7 +157,7 @@ def bulk_analyze():
                 continue
 
         try:
-            ticket, _similar_tickets = analyze_and_save_ticket(email_text)
+            ticket, _similar_tickets = analyze_and_save_ticket(email_text, include_similarity=False)
             imported_tickets.append(ticket)
             report_rows.append({
                 "row_number": row_number,
