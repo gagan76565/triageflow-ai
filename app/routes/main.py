@@ -54,6 +54,19 @@ def bulk_upload():
     return render_template("bulk_upload.html")
 
 
+@main.route("/bulk-template.csv")
+def bulk_template():
+    response = make_response(
+        "\ufeffemail\\n"
+        '"Subject: Duplicate charge on invoice\\nI was charged twice for my subscription. Please review the duplicate payment.",\\n'
+        '"The production dashboard is down and customers cannot log in. This is urgent.",\\n'
+        '"How can I reset my password and enable two-factor authentication?"\\n'
+    )
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    response.headers["Content-Disposition"] = 'attachment; filename="triageflow-sample-tickets.csv"'
+    return response
+
+
 @main.route("/bulk-analyze", methods=["POST"])
 def bulk_analyze():
     uploaded_file = request.files.get("file")
