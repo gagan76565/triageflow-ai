@@ -16,7 +16,11 @@
         <a href="{{ url_for('main.home') }}" class="text-2xl font-bold text-cyan-400">
             TriageFlow AI
         </a>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <a href="{{ url_for('main.bulk_upload') }}"
+               class="bg-violet-600 hover:bg-violet-700 px-4 py-2 rounded-lg font-semibold">
+                Bulk Analyze
+            </a>
             <a href="{{ url_for('main.home') }}#new-ticket"
                class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-semibold">
                 + New Ticket
