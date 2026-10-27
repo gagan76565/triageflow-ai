@@ -82,3 +82,58 @@ https://triageflow-ai.onrender.com
 ## Author
 
 **Gagan** — https://github.com/gagan76565
+
+## Bulk ticket analysis
+
+Use **Bulk Analyze** in the header to upload a UTF-8 CSV file containing up to 500 tickets (maximum 2 MB). The file must include a ticket-text column named `email`, `ticket`, `ticket_text`, `message`, `body`, `description`, `support_email`, `support_ticket`, or `content`. Other columns are ignored in this version.
+
+- Validates file type, size, encoding, headers, and row count.
+- Runs the same category, urgency, and team-routing pipeline used by single-ticket analysis.
+- Optionally skips exact duplicate ticket text already in the database or repeated within the uploaded file.
+- Shows analyzed, skipped, and failed rows in a batch report.
+- Exports successfully analyzed tickets as CSV.
+
+Download a sample file from the Bulk Analyze page. Excel files should be exported as CSV UTF-8 before upload.
+
+## Automatic Google Forms / Google Sheets ingestion
+
+The repository includes an authenticated webhook and a Google Apps Script connector at `integrations/google_apps_script.gs`. When an installable spreadsheet **On form submit** trigger runs, the script sends the new response row to TriageFlow AI. A stable spreadsheet/sheet/row identifier prevents retries from creating the same ticket twice.
+
+### Configure Render
+
+Set these environment variables in the Render service:
+
+- `SECRET_KEY`: a long, random value used to sign Flask sessions.
+- `TRIAGEFLOW_WEBHOOK_TOKEN`: a long, random shared secret. Do not commit this value to GitHub.
+- `DATABASE_URL` (recommended for durable deployment): a PostgreSQL connection URL. If unset, the app uses SQLite.
+
+The webhook endpoint is:
+
+```text
+POST https://triageflow-ai.onrender.com/api/integrations/google-sheets/tickets
+Header: X-Webhook-Token: <your shared secret>
+Content-Type: application/json
+
+{
+  "source_id": "spreadsheet-id:sheet-id:row-number",
+  "source_name": "Form Responses 1",
+  "email": "The support request text"
+}
+```
+
+### Configure Google Apps Script
+
+1. Open the spreadsheet linked to the Google Form.
+2. Select **Extensions → Apps Script** and paste the contents of `integrations/google_apps_script.gs`.
+3. Open **Project Settings → Script Properties** and set:
+   - `TRIAGEFLOW_API_URL` = `https://triageflow-ai.onrender.com/api/integrations/google-sheets/tickets`
+   - `TRIAGEFLOW_WEBHOOK_TOKEN` = the exact same secret set on Render
+   - `TICKET_TEXT_COLUMN` = optional, the exact response-sheet header containing the support message
+4. In Apps Script, add an installable trigger for `onFormSubmit`, event source **From spreadsheet**, event type **On form submit**.
+5. Submit a test Google Form response and verify the resulting ticket appears in the TriageFlow AI dashboard.
+
+The first trigger setup requires authorization from the Google account owner. The webhook rejects requests without the configured secret and safely returns the existing ticket for a repeated source row.
+
+## Deployment and data durability
+
+The app calls `db.create_all()` at startup, which creates the new ingestion-events table without modifying existing ticket columns. For production use, configure a persistent PostgreSQL database through `DATABASE_URL`; SQLite on an ephemeral host may lose data when the instance is replaced. Do not connect sensitive customer data until authentication, access controls, retention, and privacy requirements are addressed.
