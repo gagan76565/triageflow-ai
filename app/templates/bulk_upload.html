@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    <a href="{{ url_for('main.dashboard') }}" class="text-cyan-400 hover:text-cyan-300">← Back to Dashboard</a>
+
+    <div class="mt-6 mb-8">
+        <p class="text-cyan-400 font-semibold mb-2">BULK WORKSPACE</p>
+        <h1 class="text-4xl font-bold">Bulk Ticket Analyzer</h1>
+        <p class="text-slate-300 mt-3 text-lg">
+            Upload a CSV of customer support requests and analyze them together using your existing TriageFlow AI pipeline.
+        </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="mb-5 p-4 rounded-xl border
+                {% if category == 'error' %}bg-red-500/10 border-red-500/30 text-red-300
+                {% else %}bg-cyan-500/10 border-cyan-500/30 text-cyan-300{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <form action="{{ url_for('main.bulk_analyze') }}" method="POST" enctype="multipart/form-data"
+          class="bg-slate-800 border border-slate-700 p-6 md:p-8 rounded-2xl">
+        <label for="file" class="block text-lg font-semibold mb-3">Upload CSV file</label>
+        <input id="file" name="file" type="file" accept=".csv,text/csv" required
+               class="block w-full rounded-xl border border-slate-600 bg-slate-900 p-4 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-500 file:px-4 file:py-2 file:font-semibold file:text-white">
+
+        <div class="mt-5 bg-slate-900 border border-slate-700 rounded-xl p-4 text-sm text-slate-300 space-y-2">
+            <p class="font-semibold text-white">CSV requirements</p>
+            <p>• Include a header column named <code class="text-cyan-300">email</code>, <code class="text-cyan-300">ticket</code>, <code class="text-cyan-300">message</code>, <code class="text-cyan-300">body</code>, or <code class="text-cyan-300">description</code>.</p>
+            <p>• Maximum 500 data rows and 2 MB per upload.</p>
+            <p>• Save the file as UTF-8 CSV. Other columns are allowed and ignored by this version.</p>
+        </div>
+
+        <label class="flex items-start gap-3 mt-5 text-slate-200">
+            <input type="checkbox" name="skip_duplicates" checked class="mt-1 accent-cyan-500">
+            <span>
+                <span class="font-semibold">Skip exact duplicate tickets</span>
+                <span class="block text-sm text-slate-400 mt-1">Skip repeated ticket text within this file and exact matches already saved in TriageFlow AI.</span>
+            </span>
+        </label>
+
+        <div class="flex flex-wrap gap-3 mt-7">
+            <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl font-bold">
+                Analyze Batch
+            </button>
+            <a href="{{ url_for('main.bulk_template') }}" class="bg-slate-700 hover:bg-slate-600 px-6 py-3 rounded-xl font-semibold">
+                Download Sample CSV
+            </a>
+        </div>
+    </form>
+
+    <section class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-slate-800 rounded-xl p-5"><p class="text-slate-400 text-sm">One upload</p><p class="font-semibold mt-1">Up to 500 tickets</p></div>
+        <div class="bg-slate-800 rounded-xl p-5"><p class="text-slate-400 text-sm">Shared AI pipeline</p><p class="font-semibold mt-1">Consistent predictions</p></div>
+        <div class="bg-slate-800 rounded-xl p-5"><p class="text-slate-400 text-sm">After analysis</p><p class="font-semibold mt-1">Review and export results</p></div>
+    </section>
+</div>
+{% endblock %}
