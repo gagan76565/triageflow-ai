@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="py-5">
+    <div class="flex flex-wrap items-start justify-between gap-4 mb-8">
+        <div>
+            <p class="text-cyan-400 font-semibold mb-2">BATCH RESULTS</p>
+            <h1 class="text-4xl font-bold">Analysis Report</h1>
+            <p class="text-slate-300 mt-2">Review each row, then download the successfully analyzed tickets as a CSV report.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('main.bulk_upload') }}" class="bg-cyan-500 hover:bg-cyan-600 px-5 py-3 rounded-xl font-semibold">Analyze Another File</a>
+            <a href="{{ url_for('main.dashboard') }}" class="bg-slate-700 hover:bg-slate-600 px-5 py-3 rounded-xl font-semibold">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-slate-800 rounded-2xl p-5"><p class="text-slate-400">Rows in file</p><p class="text-3xl font-bold mt-2">{{ total_rows }}</p></div>
+        <div class="bg-slate-800 rounded-2xl p-5"><p class="text-slate-400">Analyzed and saved</p><p class="text-3xl font-bold text-green-400 mt-2">{{ imported_count }}</p></div>
+        <div class="bg-slate-800 rounded-2xl p-5"><p class="text-slate-400">Skipped</p><p class="text-3xl font-bold text-yellow-300 mt-2">{{ skipped_count }}</p></div>
+        <div class="bg-slate-800 rounded-2xl p-5"><p class="text-slate-400">Failed</p><p class="text-3xl font-bold text-red-400 mt-2">{{ failed_count }}</p></div>
+    </div>
+
+    {% if imported_count > 0 %}
+    <form action="{{ url_for('main.download_bulk_report') }}" method="POST" class="mb-6">
+        {% for row in report_rows %}
+            {% if row.status == "Analyzed" and row.ticket_id %}
+                <input type="hidden" name="ticket_ids" value="{{ row.ticket_id }}">
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="bg-green-600 hover:bg-green-700 px-5 py-3 rounded-xl font-semibold">
+            Download Analyzed Tickets (CSV)
+        </button>
+    </form>
+    {% endif %}
+
+    <section class="bg-slate-800 rounded-2xl overflow-hidden">
+        <div class="p-6 border-b border-slate-700">
+            <h2 class="text-xl font-bold">Per-ticket results</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900 text-slate-300">
+                    <tr>
+                        <th class="p-4">CSV Row</th><th class="p-4">Ticket Preview</th>
+                        <th class="p-4">Category</th><th class="p-4">Urgency</th>
+                        <th class="p-4">Assigned Team</th><th class="p-4">Confidence</th>
+                        <th class="p-4">Processing</th><th class="p-4">Ticket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report_rows %}
+                    <tr class="border-t border-slate-700 align-top">
+                        <td class="p-4">{{ row.row_number }}</td>
+                        <td class="p-4 min-w-64 max-w-md"><p class="whitespace-pre-wrap break-words text-slate-300">{{ row.email[:220] }}{% if row.email|length > 220 %}…{% endif %}</p></td>
+                        <td class="p-4">{{ row.category }}</td>
+                        <td class="p-4 whitespace-nowrap">{{ row.urgency }}</td>
+                        <td class="p-4">{{ row.assigned_team }}</td>
+                        <td class="p-4 whitespace-nowrap">{% if row.confidence is not none %}{{ "%.2f"|format(row.confidence) }}%{% else %}—{% endif %}</td>
+                        <td class="p-4"><span class="text-sm {% if row.status == 'Analyzed' %}text-green-300{% elif row.status.startswith('Skipped') %}text-yellow-300{% else %}text-red-300{% endif %}">{{ row.status }}</span></td>
+                        <td class="p-4 whitespace-nowrap">
+                            {% if row.ticket_id and row.status == "Analyzed" %}
+                                <a class="text-cyan-400 underline" href="{{ url_for('main.ticket_detail', ticket_id=row.ticket_id) }}">View #{{ row.ticket_id }}</a>
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8" class="p-8 text-center text-slate-400">No data rows were found in this file.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}
